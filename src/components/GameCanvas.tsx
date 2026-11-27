@@ -45,8 +45,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let width = container.clientWidth || window.innerWidth;
-    let height = container.clientHeight || window.innerHeight;
+    let width = 0;
+    let height = 0;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const resize = () => {
@@ -56,7 +56,12 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       // Ignore zero sizes (canvas hidden) and no-op resizes to avoid
       // clearing the canvas and triggering ResizeObserver loops.
       if (nextWidth < 1 || nextHeight < 1) return;
-      if (nextWidth === width && nextHeight === height && nextDpr === dpr) return;
+      // width/height start at 0 so the initial resize() always runs and the
+      // canvas backing store is sized to the container. Otherwise the guard
+      // would early-return on mount (same values read twice) and the canvas
+      // would keep its default 300x150 backing store, rendering the game
+      // stretched until the window is resized.
+      if (width > 0 && nextWidth === width && nextHeight === height && nextDpr === dpr) return;
       width = nextWidth;
       height = nextHeight;
       dpr = nextDpr;
