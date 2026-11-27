@@ -1,0 +1,235 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isNonNegNumber(val) {
+      return val is number && val >= 0 && val <= 100000000;
+    }
+
+    function isBoundedStringArray(arr, maxLen) {
+      return arr is list && arr.size() <= maxLen && (arr.size() == 0 || (arr[0] is string && arr[0].size() <= 64));
+    }
+
+    function isValidCareerProfile(data) {
+      return data.keys().hasAll([
+        'ownerUid',
+        'clubName',
+        'crestId',
+        'coins',
+        'clubXp',
+        'winStreak',
+        'bestWinStreak',
+        'unlockedPlayerIds',
+        'unlockedKitIds',
+        'selectedStrikerId',
+        'selectedKeeperId',
+        'selectedKitId',
+        'selectedPowerupRole',
+        'earnedTrophyIds',
+        'claimedAchievementIds',
+        'playerUpgrades',
+        'activeCupStage',
+        'careerWins',
+        'careerLosses',
+        'cleanSheets',
+        'totalGoals',
+        'blue2PWins',
+        'red2PWins',
+        'fastestShotKmh',
+        'createdAt',
+        'updatedAt'
+      ]) && data.keys().hasOnly([
+        'ownerUid',
+        'clubName',
+        'crestId',
+        'coins',
+        'clubXp',
+        'winStreak',
+        'bestWinStreak',
+        'unlockedPlayerIds',
+        'unlockedKitIds',
+        'selectedStrikerId',
+        'selectedKeeperId',
+        'selectedKitId',
+        'selectedPowerupRole',
+        'earnedTrophyIds',
+        'claimedAchievementIds',
+        'playerUpgrades',
+        'activeCupId',
+        'activeCupStage',
+        'careerWins',
+        'careerLosses',
+        'cleanSheets',
+        'totalGoals',
+        'blue2PWins',
+        'red2PWins',
+        'fastestShotKmh',
+        'hasCustomizedClubName',
+        'createdAt',
+        'updatedAt'
+      ])
+      && isValidId(data.ownerUid)
+      && data.ownerUid == request.auth.uid
+      && data.clubName is string && data.clubName.size() >= 1 && data.clubName.size() <= 36
+      && isValidId(data.crestId) && data.crestId.size() <= 32
+      && (!('hasCustomizedClubName' in data) || data.hasCustomizedClubName is bool)
+      && isNonNegNumber(data.coins)
+      && isNonNegNumber(data.clubXp)
+      && isNonNegNumber(data.winStreak)
+      && isNonNegNumber(data.bestWinStreak)
+      && isBoundedStringArray(data.unlockedPlayerIds, 30)
+      && isBoundedStringArray(data.unlockedKitIds, 30)
+      && isValidId(data.selectedStrikerId) && data.selectedStrikerId.size() <= 48
+      && isValidId(data.selectedKeeperId) && data.selectedKeeperId.size() <= 48
+      && isValidId(data.selectedKitId) && data.selectedKitId.size() <= 48
+      && (data.selectedPowerupRole == 'striker' || data.selectedPowerupRole == 'keeper')
+      && isBoundedStringArray(data.earnedTrophyIds, 20)
+      && isBoundedStringArray(data.claimedAchievementIds, 30)
+      && data.playerUpgrades is map && data.playerUpgrades.size() <= 24
+      && (!('activeCupId' in data) || data.activeCupId == null || (data.activeCupId is string && data.activeCupId.size() <= 48))
+      && isNonNegNumber(data.activeCupStage)
+      && isNonNegNumber(data.careerWins)
+      && isNonNegNumber(data.careerLosses)
+      && isNonNegNumber(data.cleanSheets)
+      && isNonNegNumber(data.totalGoals)
+      && isNonNegNumber(data.blue2PWins)
+      && isNonNegNumber(data.red2PWins)
+      && isNonNegNumber(data.fastestShotKmh)
+      && data.createdAt is timestamp
+      && data.updatedAt is timestamp;
+    }
+
+    function isValidLeaderboardEntry(data) {
+      return data.keys().hasAll([
+        'ownerUid',
+        'clubName',
+        'managerName',
+        'crestId',
+        'trophiesCount',
+        'careerWins',
+        'clubXp',
+        'fastestShotKmh',
+        'updatedAt'
+      ]) && data.keys().hasOnly([
+        'ownerUid',
+        'clubName',
+        'managerName',
+        'crestId',
+        'trophiesCount',
+        'careerWins',
+        'clubXp',
+        'fastestShotKmh',
+        'updatedAt'
+      ])
+      && isValidId(data.ownerUid)
+      && data.ownerUid == request.auth.uid
+      && data.clubName is string && data.clubName.size() >= 1 && data.clubName.size() <= 36
+      && data.managerName is string && data.managerName.size() >= 1 && data.managerName.size() <= 40
+      && isValidId(data.crestId) && data.crestId.size() <= 32
+      && isNonNegNumber(data.trophiesCount)
+      && isNonNegNumber(data.careerWins)
+      && isNonNegNumber(data.clubXp)
+      && isNonNegNumber(data.fastestShotKmh)
+      && data.updatedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false;
+      allow create: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidCareerProfile(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidCareerProfile(incoming())
+        && incoming().ownerUid == existing().ownerUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'clubName',
+          'crestId',
+          'hasCustomizedClubName',
+          'coins',
+          'clubXp',
+          'winStreak',
+          'bestWinStreak',
+          'unlockedPlayerIds',
+          'unlockedKitIds',
+          'selectedStrikerId',
+          'selectedKeeperId',
+          'selectedKitId',
+          'selectedPowerupRole',
+          'earnedTrophyIds',
+          'claimedAchievementIds',
+          'playerUpgrades',
+          'activeCupId',
+          'activeCupStage',
+          'careerWins',
+          'careerLosses',
+          'cleanSheets',
+          'totalGoals',
+          'blue2PWins',
+          'red2PWins',
+          'fastestShotKmh',
+          'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /leaderboards/{userId} {
+      allow get: if isSignedIn() && isValidId(userId);
+      allow list: if isSignedIn();
+      allow create: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidLeaderboardEntry(incoming())
+        && incoming().updatedAt == request.time;
+      allow update: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && isValidLeaderboardEntry(incoming())
+        && incoming().ownerUid == existing().ownerUid
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'clubName',
+          'managerName',
+          'crestId',
+          'trophiesCount',
+          'careerWins',
+          'clubXp',
+          'fastestShotKmh',
+          'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+  }
+}

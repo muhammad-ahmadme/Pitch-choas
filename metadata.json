@@ -1,0 +1,8 @@
+{
+  "name": "Pitch Chaos",
+  "description": "2D physics ragdoll soccer arcade game with randomized pitch mutators, deformable nets, and 1P or local 2P chaos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "entities": {
+    "CareerProfileDoc": {
+      "title": "CareerProfileDoc",
+      "description": "Authenticated player career save, unlocked squads, kits, trophies, upgrades, and club statistics.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "clubName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 36
+        },
+        "crestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "coins": {
+          "type": "number"
+        },
+        "clubXp": {
+          "type": "number"
+        },
+        "winStreak": {
+          "type": "number"
+        },
+        "bestWinStreak": {
+          "type": "number"
+        },
+        "unlockedPlayerIds": {
+          "type": "array"
+        },
+        "unlockedKitIds": {
+          "type": "array"
+        },
+        "selectedStrikerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "selectedKeeperId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "selectedKitId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "selectedPowerupRole": {
+          "type": "string",
+          "enum": ["striker", "keeper"]
+        },
+        "earnedTrophyIds": {
+          "type": "array"
+        },
+        "claimedAchievementIds": {
+          "type": "array"
+        },
+        "playerUpgrades": {
+          "type": "object"
+        },
+        "activeCupId": {
+          "type": "string",
+          "maxLength": 48
+        },
+        "activeCupStage": {
+          "type": "number"
+        },
+        "careerWins": {
+          "type": "number"
+        },
+        "careerLosses": {
+          "type": "number"
+        },
+        "cleanSheets": {
+          "type": "number"
+        },
+        "totalGoals": {
+          "type": "number"
+        },
+        "blue2PWins": {
+          "type": "number"
+        },
+        "red2PWins": {
+          "type": "number"
+        },
+        "fastestShotKmh": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerUid",
+        "clubName",
+        "crestId",
+        "coins",
+        "clubXp",
+        "winStreak",
+        "bestWinStreak",
+        "unlockedPlayerIds",
+        "unlockedKitIds",
+        "selectedStrikerId",
+        "selectedKeeperId",
+        "selectedKitId",
+        "selectedPowerupRole",
+        "earnedTrophyIds",
+        "claimedAchievementIds",
+        "playerUpgrades",
+        "activeCupStage",
+        "careerWins",
+        "careerLosses",
+        "cleanSheets",
+        "totalGoals",
+        "blue2PWins",
+        "red2PWins",
+        "fastestShotKmh",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Public non-PII club ranking card for global single-player career standings.",
+      "type": "object",
+      "properties": {
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "clubName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 36
+        },
+        "managerName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "crestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "trophiesCount": {
+          "type": "number"
+        },
+        "careerWins": {
+          "type": "number"
+        },
+        "clubXp": {
+          "type": "number"
+        },
+        "fastestShotKmh": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerUid",
+        "clubName",
+        "managerName",
+        "crestId",
+        "trophiesCount",
+        "careerWins",
+        "clubXp",
+        "fastestShotKmh",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/CareerProfileDoc"
+      },
+      "description": "Private authenticated user career profile, unlocks, upgrades, and match stats."
+    },
+    "/leaderboards/{userId}": {
+      "schema": {
+        "$ref": "#/entities/LeaderboardEntry"
+      },
+      "description": "Public non-PII club career leaderboard entry owned by the authenticated user."
+    }
+  }
+}
