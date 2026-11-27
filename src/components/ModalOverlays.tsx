@@ -90,7 +90,7 @@ export const ModalOverlays: React.FC<ModalOverlaysProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
-        className="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-700/80 p-6 md:p-7 shadow-2xl"
+        className="w-full max-w-md max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-2xl bg-slate-900 border border-slate-700/80 p-5 sm:p-6 md:p-7 shadow-2xl"
       >
         {isGameOver ? (
           <>
@@ -338,8 +338,8 @@ export const ModalOverlays: React.FC<ModalOverlaysProps> = ({
                 ? 'Global matches run live on the server and cannot be paused for your opponent.'
                 : deviceMode === 'mobile'
                   ? mode === '2P'
-                    ? 'Left pad controls Blue (move, kick & power-up). Right pad controls Red.'
-                    : 'Use bottom-left ◀ ▶ to move, and bottom-right buttons to jump/kick and activate Power-Ups.'
+                    ? 'Left joystick controls Blue (move, kick & power-up). Right joystick controls Red.'
+                    : 'Use the bottom-left joystick to move, and bottom-right buttons to jump/kick and activate Power-Ups.'
                   : mode === '2P'
                     ? 'Blue: A / D Move, W Kick, S Power-Up. Red: ← / → Move, ↑ Kick, ↓ Power-Up.'
                     : 'Move: A / D or ← / →. Jump & Kick: W / Space / ↑. Activate Power-Up: S / E / ↓.'}

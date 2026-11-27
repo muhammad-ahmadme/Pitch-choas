@@ -24,7 +24,7 @@ export class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+        <div className="min-h-dvh w-full bg-slate-950 text-slate-100 flex items-center justify-center p-6">
           <div className="max-w-md w-full rounded-xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-4">
             <h1 className="font-display font-extrabold text-3xl text-amber-300">
               Match Connection Interrupted

@@ -81,7 +81,7 @@ export const MatchLoadingScreen: React.FC<MatchLoadingScreenProps> = ({
         : 'STADIUM FLOODLIGHTS MAX — KICKOFF!';
 
   return (
-    <div className="absolute inset-0 z-30 flex flex-col justify-between bg-slate-950 text-slate-100 overflow-hidden p-4 sm:p-8 select-none">
+    <div className="absolute inset-0 z-30 flex flex-col justify-between bg-slate-950 text-slate-100 overflow-y-auto p-4 sm:p-8 select-none">
       {/* Diagonal Arcade Sky vs Crimson Stadium Split */}
       <div
         aria-hidden="true"

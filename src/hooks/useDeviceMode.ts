@@ -40,22 +40,24 @@ export function useDeviceMode(): DeviceMode {
     };
 
     const handleResize = () => {
-      const hasCoarsePointer =
-        typeof window.matchMedia === 'function' &&
-        window.matchMedia('(pointer: coarse)').matches;
-      if (window.innerWidth < 768 && hasCoarsePointer) {
-        setDeviceMode('mobile');
-      }
+      // Re-detect on every resize so controls switch correctly when the
+      // window is resized, rotated, or moved across breakpoints.
+      setDeviceMode(detectInitialDeviceMode());
     };
 
     window.addEventListener('pointerdown', handlePointerDown, { passive: true });
     window.addEventListener('keydown', handleKeyDown, { passive: true });
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    const visualViewport = window.visualViewport ?? null;
+    visualViewport?.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      visualViewport?.removeEventListener('resize', handleResize);
     };
   }, []);
 
