@@ -50,9 +50,16 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const resize = () => {
-      width = container.clientWidth || window.innerWidth;
-      height = container.clientHeight || window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const nextWidth = container.clientWidth || window.innerWidth;
+      const nextHeight = container.clientHeight || window.innerHeight;
+      const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Ignore zero sizes (canvas hidden) and no-op resizes to avoid
+      // clearing the canvas and triggering ResizeObserver loops.
+      if (nextWidth < 1 || nextHeight < 1) return;
+      if (nextWidth === width && nextHeight === height && nextDpr === dpr) return;
+      width = nextWidth;
+      height = nextHeight;
+      dpr = nextDpr;
       canvas.width = Math.max(1, Math.floor(width * dpr));
       canvas.height = Math.max(1, Math.floor(height * dpr));
       canvas.style.width = `${width}px`;
@@ -62,6 +69,13 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     resize();
     const observer = new ResizeObserver(resize);
     observer.observe(container);
+    // ResizeObserver alone misses DPR-only changes (browser zoom, dragging
+    // across monitors) and visual-viewport changes (mobile URL bar, pinch
+    // zoom) that don't resize the container. Listen for those too.
+    window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', resize);
+    const visualViewport = window.visualViewport ?? null;
+    visualViewport?.addEventListener('resize', resize);
 
     const heldKeys = new Set<string>();
     const justPressedKeys = new Set<string>();
@@ -113,6 +127,12 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     const frame = (now: number) => {
       const rawDt = (now - lastTime) / 1000;
       lastTime = now;
+
+      // Catch DPR-only changes (e.g. dragging across monitors) that fire
+      // no resize event.
+      if (Math.min(window.devicePixelRatio || 1, 2) !== dpr) {
+        resize();
+      }
 
       const isSingleInput =
         engine.config.mode === '1P' ||
@@ -209,6 +229,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     return () => {
       cancelAnimationFrame(rafId);
       observer.disconnect();
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('orientationchange', resize);
+      visualViewport?.removeEventListener('resize', resize);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', clearAllKeys);

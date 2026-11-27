@@ -9,10 +9,18 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    overscroll-behavior: none;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
+  }
+
+  /* Dynamic viewport height: tracks mobile URL-bar show/hide, orientation
+     changes and browser-chrome resizing without layout jumps. */
+  #root {
+    height: 100vh;
+    height: 100dvh;
   }
 }
 

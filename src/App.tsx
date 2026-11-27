@@ -1073,7 +1073,7 @@ export default function App() {
 
   if (!authReady) {
     return (
-      <main className="relative w-screen h-screen overflow-hidden bg-[radial-gradient(ellipse_at_top,rgba(14,165,233,0.28),transparent_55%),linear-gradient(to_bottom,#020617,#071326,#022c22)] flex flex-col items-center justify-center p-6 text-slate-100">
+      <main className="relative w-full h-dvh overflow-hidden bg-[radial-gradient(ellipse_at_top,rgba(14,165,233,0.28),transparent_55%),linear-gradient(to_bottom,#020617,#071326,#022c22)] flex flex-col items-center justify-center p-6 text-slate-100">
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -1107,7 +1107,7 @@ export default function App() {
   }
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-slate-950">
+    <main className="relative w-full h-dvh overflow-hidden bg-slate-950">
       {showMatchCanvas && (
         <GameCanvas
           engine={engine}

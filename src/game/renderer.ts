@@ -16,11 +16,18 @@ export function renderGame(
   viewportH: number
 ): void {
   const m = engine.mutator;
+  if (viewportW < 1 || viewportH < 1) return;
   ctx.save();
 
-  const scaleX = viewportW / WORLD_WIDTH;
-  const scaleY = viewportH / WORLD_HEIGHT;
-  const scale = Math.min(scaleX, scaleY);
+  // Dynamic fit: always fill the viewport width so the pitch spans edge to
+  // edge on any display. Vertical alignment adapts to the aspect ratio:
+  // wide screens bottom-align (cropping sky, keeping the ground line and
+  // apron visible), narrow/portrait screens center (letterbox bars above
+  // and below, never cropping the goals sideways).
+  const scale = viewportW / WORLD_WIDTH;
+  const viewportAspect = viewportW / viewportH;
+  const worldAspect = WORLD_WIDTH / WORLD_HEIGHT;
+  const isWide = viewportAspect >= worldAspect;
 
   const skyGrad = ctx.createLinearGradient(0, 0, 0, viewportH);
   skyGrad.addColorStop(0, m.skyTop);
@@ -39,8 +46,10 @@ export function renderGame(
     shakeY = (Math.random() - 0.5) * 2 * mag;
   }
 
-  const offsetX = (viewportW - WORLD_WIDTH * scale) * 0.5 + shakeX * scale;
-  const offsetY = (viewportH - WORLD_HEIGHT * scale) * 0.5 + shakeY * scale;
+  const offsetX = shakeX * scale;
+  const offsetY = isWide
+    ? viewportH - WORLD_HEIGHT * scale + shakeY * scale
+    : (viewportH - WORLD_HEIGHT * scale) * 0.5 + shakeY * scale;
 
   ctx.translate(offsetX, offsetY);
   ctx.scale(scale, scale);
@@ -105,12 +114,13 @@ export function renderGame(
   drawDustMotes(ctx, engine);
   drawStadiumVignette(ctx, engine);
 
+  ctx.restore();
+
+  // Screen-space flash so letterbox bars on narrow screens flash too.
   if (engine.flashAlpha > 0.01) {
     ctx.fillStyle = `rgba(255, 255, 255, ${engine.flashAlpha * 0.38})`;
-    ctx.fillRect(-350, -250, WORLD_WIDTH + 700, WORLD_HEIGHT + 500);
+    ctx.fillRect(0, 0, viewportW, viewportH);
   }
-
-  ctx.restore();
 }
 
 function drawStadiumBackdrop(ctx: CanvasRenderingContext2D, engine: SoccerEngine): void {

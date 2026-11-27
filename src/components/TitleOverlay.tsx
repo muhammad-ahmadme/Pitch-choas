@@ -698,8 +698,8 @@ export const TitleOverlay: React.FC<TitleOverlayProps> = ({
           <span>
             {deviceMode === 'mobile'
               ? config.mode === '2P'
-                ? 'TOUCH: Left Pad Blue ◀ ▶ Kick & Power · Right Pad Red ◀ ▶ Kick & Power'
-                : 'TOUCH: Left Pad Move ◀ ▶ · Right Pad Jump/Kick & Power-Up'
+                ? 'TOUCH: Left Joystick Blue Move · Kick & Power · Right Joystick Red Move · Kick & Power'
+                : 'TOUCH: Left Joystick Move · Right Pad Jump/Kick & Power-Up'
               : config.mode === '2P'
                 ? 'BLUE: A/D Move · W Kick · S Power  |  RED: ◀/▶ Move · ▲ Kick · ▼ Power  |  P Pause'
                 : 'MOVE: A/D or ◀/▶ · KICK: W / Space / ▲ · POWER-UP: S / E / ▼ · P Pause · M Mute'}
